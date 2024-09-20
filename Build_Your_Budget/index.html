@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your Budget</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --card-background: #ffffff;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --income-color: #2ecc71;
+            --expense-color: #e74c3c;
+            --saving-color: #f39c12;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .card {
+            background-color: var(--card-background);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        button {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.9);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+        }
+        .transaction-details {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .transaction-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        .transaction-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .transaction-description {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .transaction-date {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+        .transaction-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .transaction-actions button {
+            padding: 8px 12px;
+            font-size: 12px;
+            margin-bottom: 0;
+        }
+        .export-btn {
+            background-color: var(--secondary-color);
+            margin-top: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .summary-card {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .summary-item {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 48%;
+        }
+        .summary-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .summary-value {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .transaction-list {
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .transaction-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .transaction-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .transaction-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .transaction-list::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        @media (max-width: 767px) {
+            .container {
+                padding: 10px;
+            }
+            h1, h2 {
+                font-size: 20px;
+            }
+            .card {
+                padding: 15px;
+            }
+            .transaction-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .transaction-actions {
+                margin-top: 10px;
+                width: 100%;
+            }
+            .transaction-actions button {
+                flex: 1;
+            }
+            .summary-item {
+                width: 100%;
+            }
+        }
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .container {
+                max-width: 90%;
+                padding: 20px;
+            }
+            h1, h2 {
+                font-size: 28px;
+            }
+            .card {
+                padding: 25px;
+            }
+            .summary-item {
+                width: 48%;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                max-width: 1100px;
+                padding: 25px;
+            }
+            h1 {
+                grid-column: 1 / -1;
+            }
+            .summary-card {
+                grid-column: 1 / -1;
+            }
+            .budget-form, .transaction-form {
+                grid-column: 1 / 2;
+            }
+            .transaction-list {
+                grid-column: 2 / 3;
+                grid-row: 3 / span 2;
+            }
+            .export-btn {
+                grid-column: 1 / 2;
+            }
+            .footer {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Build Your Budget</h1>
+        
+        <div class="summary-card">
+            <div class="summary-item">
+                <div class="summary-label">Total Income</div>
+                <div id="total-income" class="summary-value">$0.00</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Total Expenses</div>
+                <div id="total-expenses" class="summary-value">$0.00</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Total Savings</div>
+                <div id="total-savings" class="summary-value">$0.00</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Current Balance</div>
+                <div id="current-balance" class="summary-value">$0.00</div>
+            </div>
+        </div>
+
+        <div class="card budget-form">
+            <h2>Set Budget</h2>
+            <input type="number" id="budget-amount" placeholder="Enter budget amount">
+            <button onclick="setBudget()">Set Budget</button>
+        </div>
+        
+        <div class="card transaction-form">
+            <h2 id="transaction-form-title">Add Transaction</h2>
+            <input type="text" id="transaction-description" placeholder="Description">
+            <input type="number" id="transaction-amount" placeholder="Amount">
+            <select id="transaction-type" aria-label="Transaction Type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+                <option value="saving">Saving</option>
+            </select>
+            <input type="datetime-local" id="transaction-date" aria-label="Transaction Date and Time">
+            <button id="transaction-submit-btn" onclick="submitTransaction()">Add Transaction</button>
+        </div>
+        
+        <div class="card transaction-list">
+            <h2>Transactions</h2>
+            <div id="transactions"></div>
+        </div>
+        
+        <button class="export-btn" onclick="exportToPDF()">Export Transactions</button>
+
+        <div class="footer">
+            Made by: Shashank Karan
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        let budget = 0;
+        let transactions = [];
+        let editingIndex = -1;
+
+        function loadSavedData() {
+            const savedBudget = localStorage.getItem('budget');
+            const savedTransactions = localStorage.getItem('transactions');
+            
+            if (savedBudget) {
+                budget = parseFloat(savedBudget);
+                document.getElementById('budget-amount').value = budget;
+            }
+            
+            if (savedTransactions) {
+                transactions = JSON.parse(savedTransactions);
+            }
+            
+            updateTransactions();
+            updateSummary();
+        }
+
+        function saveData() {
+            localStorage.setItem('budget', budget);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        function setBudget() {
+            const budgetAmount = document.getElementById('budget-amount').value;
+            if (budgetAmount) {
+                budget = parseFloat(budgetAmount);
+                alert(`Budget set to $${budget.toFixed(2)}`);
+                updateTransactions();
+                updateSummary();
+                saveData();
+            }
+        }
+
+        function submitTransaction() {
+            const description = document.getElementById('transaction-description').value;
+            const amount = parseFloat(document.getElementById('transaction-amount').value);
+            const type = document.getElementById('transaction-type').value;
+            const date = document.getElementById('transaction-date').value;
+
+            if (description && amount && date) {
+                if (editingIndex === -1) {
+                    transactions.unshift({ description, amount, type, date });
+                } else {
+                    transactions[editingIndex] = { description, amount, type, date };
+                    editingIndex = -1;
+                    document.getElementById('transaction-form-title').textContent = 'Add Transaction';
+                    document.getElementById('transaction-submit-btn').textContent = 'Add Transaction';
+                }
+                updateTransactions();
+                updateSummary();
+                clearTransactionForm();
+                saveData();
+            }
+        }
+
+        function clearTransactionForm() {
+            document.getElementById('transaction-description').value = '';
+            document.getElementById('transaction-amount').value = '';
+            document.getElementById('transaction-type').selectedIndex = 0;
+            document.getElementById('transaction-date').value = '';
+        }
+
+        function updateTransactions() {
+            const transactionList = document.getElementById('transactions');
+            transactionList.innerHTML = '';
+            let balance = budget;
+
+            transactions.forEach((transaction, index) => {
+                const item = document.createElement('div');
+                item.className = `transaction-item ${transaction.type}`;
+                let amount;
+                if (transaction.type === 'income') {
+                    amount = transaction.amount;
+                } else if (transaction.type === 'expense') {
+                    amount = -transaction.amount;
+                } else { // saving
+                    amount = -transaction.amount; // Deduct from balance like an expense
+                }
+                balance += amount;
+                item.innerHTML = `
+                    <div class="transaction-details">
+                        <span class="transaction-icon">${transaction.type === 'income' ? '💰' : transaction.type === 'expense' ? '💸' : '🏦'}</span>
+                        <div class="transaction-info">
+                            <span class="transaction-description">${transaction.description}</span>
+                            <span class="transaction-amount" style="color: ${amount >= 0 ? 'var(--income-color)' : transaction.type === 'saving' ? 'var(--saving-color)' : 'var(--expense-color)'}">
+                                ${amount >= 0 ? '+' : '-'}$${Math.abs(transaction.amount).toFixed(2)}
+                            </span>
+                            <span class="transaction-date">${new Date(transaction.date).toLocaleString()}</span>
+                        </div>
+                    </div>
+                    <div class="transaction-actions">
+                        <button onclick="editTransaction(${index})" style="background-color: #f39c12;">Edit</button>
+                        <button onclick="removeTransaction(${index})" style="background-color: #e74c3c;">Remove</button>
+                    </div>
+                `;
+                transactionList.appendChild(item);
+            });
+
+            const balanceItem = document.createElement('div');
+            balanceItem.className = 'transaction-item';
+            balanceItem.innerHTML = `
+                <div class="transaction-details">
+                    <strong class="transaction-description">Balance:</strong>
+                    <strong class="transaction-amount" style="color: ${balance >= 0 ? 'var(--income-color)' : 'var(--expense-color)'}">$${balance.toFixed(2)}</strong>
+                </div>
+            `;
+            transactionList.appendChild(balanceItem);
+        }
+
+        function removeTransaction(index) {
+            transactions.splice(index, 1);
+            updateTransactions();
+            updateSummary();
+            saveData();
+        }
+
+        function editTransaction(index) {
+            const transaction = transactions[index];
+            document.getElementById('transaction-description').value = transaction.description;
+            document.getElementById('transaction-amount').value = transaction.amount;
+            document.getElementById('transaction-type').value = transaction.type;
+            document.getElementById('transaction-date').value = transaction.date;
+            
+            editingIndex = index;
+            document.getElementById('transaction-form-title').textContent = 'Edit Transaction';
+            document.getElementById('transaction-submit-btn').textContent = 'Update Transaction';
+        }
+
+        function updateSummary() {
+            let totalIncome = 0;
+            let totalExpenses = 0;
+            let totalSavings = 0;
+            let balance = budget;
+
+            transactions.forEach(transaction => {
+                if (transaction.type === 'income') {
+                    totalIncome += transaction.amount;
+                    balance += transaction.amount;
+                } else if (transaction.type === 'expense') {
+                    totalExpenses += transaction.amount;
+                    balance -= transaction.amount;
+                } else if (transaction.type === 'saving') {
+                    totalSavings += transaction.amount;
+                    balance -= transaction.amount;
+                }
+            });
+
+            document.getElementById('total-income').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('total-expenses').textContent = `$${totalExpenses.toFixed(2)}`;
+            document.getElementById('total-savings').textContent = `$${totalSavings.toFixed(2)}`;
+            document.getElementById('current-balance').textContent = `$${balance.toFixed(2)}`;
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(22);
+            doc.text("Budget Management Report", 20, 20);
+            
+            doc.setFontSize(16);
+            doc.text(`Current Budget: $${budget.toFixed(2)}`, 20, 35);
+            
+            doc.text("Transactions:", 20, 50);
+            let y = 60;
+            transactions.forEach((t, i) => {
+                doc.setFontSize(12);
+                doc.text(`${i + 1}. ${t.description}: $${t.amount.toFixed(2)} (${t.type}) - ${new Date(t.date).toLocaleString()}`, 30, y);
+                y += 10;
+            });
+            
+            doc.setFontSize(14);
+            doc.text(`Total Income: $${document.getElementById('total-income').textContent}`, 20, y + 10);
+            doc.text(`Total Expenses: $${document.getElementById('total-expenses').textContent}`, 20, y + 20);
+            doc.text(`Total Savings: $${document.getElementById('total-savings').textContent}`, 20, y + 30);
+            doc.text(`Current Balance: $${document.getElementById('current-balance').textContent}`, 20, y + 40);
+            
+            doc.setFontSize(10);
+            doc.text("Made by: Shashank Karan", 20, doc.internal.pageSize.height - 10);
+            
+            doc.save("budget_report.pdf");
+        }
+
+        loadSavedData();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
